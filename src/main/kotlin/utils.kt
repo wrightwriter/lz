@@ -33,6 +33,8 @@ fun PApplet.camera(eye: PVector, lookAt: PVector){
 }
 
 
+
+
 var PVector.x: Float
     get() = this.x
     set(v) {
@@ -60,6 +62,10 @@ fun FloatArray.toVec(): PVector {
 //fun PApplet.w_point_2D(p: PVector){
 //    poin
 //}
+
+fun cross(a: PVector, b: PVector): PVector{
+    return a.copy().cross(b)
+}
 
 fun PVector.length(): Float{
     return sqrt(this.x*this.x + this.y*this.y + this.z*this.z)
@@ -89,6 +95,8 @@ object MathUtils {
     const val tau = 2 * pi
 }
 
+
+
 operator fun PVector.get(a: Int): Float {
     if(a == 0){
         return this.x
@@ -109,12 +117,29 @@ fun PVector.abs(): PVector{
     return PVector(abs(this.x), abs(this.y), abs(this.z))
 }
 
+fun lerp(a: Float, b: Float, c: Float): Float{
+    return a*(1f-c) + b * c;
+}
+
+fun lerp(a: PVector, b: PVector, c: Float): PVector{
+    return PVector(
+        lerp(a.x,b.x,c),
+        lerp(a.y,b.y,c),
+        lerp(a.z,b.z,c),
+    )
+}
+
+
 
 //public fun <T: Number> Vec(x: T, y: T, z: T): PVector{
 //fun <T: Number> PApplet.line(a: T, b: T, c: T, d: T){
 //    line(a,b,c,d)
 //}
 
+
+fun PApplet.point(a: PVector){
+    point(a.x,a.y, a.z)
+}
 
 fun PApplet.line(a: PVector, b: PVector){
     line(a.x,a.y, a.z,b.x,b.y, b.z)

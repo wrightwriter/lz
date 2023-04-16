@@ -1,14 +1,11 @@
-import MathUtils.tau
 import com.krab.lazy.LazyGui
 //import lazy.LazyGui
 import processing.core.PApplet
 import processing.sound.AudioSample
-import processing.sound.SoundFile
-
 
 
 fun main(args: Array<String>) {
-    Plotter.run()
+    PlotterFFT.run()
 }
 
 private fun PApplet.playAudio(
@@ -58,10 +55,10 @@ private fun PApplet.draw_curve(
     endShape()
 }
 
-class Plotter : PApplet() {
+class PlotterFFT : PApplet() {
     companion object {
         fun run() {
-            val art = Plotter()
+            val art = PlotterFFT()
             art.runSketch()
         }
     }

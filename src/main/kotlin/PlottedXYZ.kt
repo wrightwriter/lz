@@ -1,13 +1,13 @@
 //import lazy.LazyGui
+import MathUtils.pi
 import com.krab.lazy.LazyGui
-import com.krab.lazy.ShaderReloader
 import processing.core.PApplet
-import processing.opengl.PShader
-import kotlin.math.tan
+import processing.core.PVector
+import java.text.DecimalFormat
 
 
 fun main(args: Array<String>) {
-    Plotter2.run()
+    PlottedXYZ.run()
 }
 
 private fun PApplet.draw_curve(
@@ -23,7 +23,7 @@ private fun PApplet.draw_curve(
             idx,
 //                    sin(idx*tau*freq.toFloat() + 0.25f*tau),
             fn(idx),
-            1
+            0
         )
         sx.x -= 0.5f;
         sx.y *= amp
@@ -39,10 +39,34 @@ private fun PApplet.draw_curve(
     endShape()
 }
 
-class Plotter2 : PApplet() {
+private fun PApplet.draw_curve_2d(
+    range:Int = 500,
+    fn: (x: Float)->PVector,
+    amp: Float = 1.0f,
+    offs: Float = 0.0f
+){
+    beginShape()
+    for(x in 0..range){
+        val idx = x.toFloat()/range.toFloat()
+        var sx = fn(idx)
+        sx.x -= 0.5f;
+        sx.y *= amp
+        sx.y += offs
+
+        if(x== 0)
+            curveVertex(sx)
+        if(x == range)
+            curveVertex(sx)
+
+        curveVertex(sx)
+    }
+    endShape()
+}
+
+class PlottedXYZ : PApplet() {
     companion object {
         fun run() {
-            val art = Plotter2()
+            val art = PlottedXYZ()
             art.runSketch()
         }
     }
@@ -180,32 +204,30 @@ class Plotter2 : PApplet() {
 
 
 
-        if (true){
-            push()
-    //            tint(gui.slider("grid opacity"))
-                w_strokeWeight(2.0f)
-                val line_iters = 20
+        push()
+//            tint(gui.slider("grid opacity"))
+            w_strokeWeight(2.0f)
+            val line_iters = 20
 
-                val alpha = gui.slider("alpha")
-                for(i in 0..line_iters){
-                    val idx = i.toFloat()/line_iters * 8.0f - 4.0f
+            val alpha = gui.slider("alpha")
+            for(i in 0..line_iters){
+                val idx = i.toFloat()/line_iters * 8.0f - 4.0f
 
 //                    (0xFFFFFF & col + 0x01000000 * alpha)
-                    stroke(gui.colorPicker("line col x").adjust(alpha = alpha))
-    //                tint(255f, 0.0f)
-                    line(Vec(4,idx,0),Vec(-4,idx,0))
-                    line(Vec(-4,0, idx),Vec(4,0,idx))
-                    stroke(gui.colorPicker("line col y").adjust(alpha = alpha))
-                    line(Vec(idx,0,4),Vec(idx,0,-4))
-                    line(Vec(0,idx,4),Vec(0,idx,-4))
-                    stroke(gui.colorPicker("line col z").adjust(alpha = alpha))
-                    line(Vec(idx,-4,0),Vec(idx,4,0))
-                    line(Vec(0,-4, idx),Vec(0,4,idx))
+                stroke(gui.colorPicker("line col x").adjust(alpha = alpha))
+//                tint(255f, 0.0f)
+                line(Vec(4,idx,0),Vec(-4,idx,0))
+                line(Vec(-4,0, idx),Vec(4,0,idx))
+                stroke(gui.colorPicker("line col y").adjust(alpha = alpha))
+                line(Vec(idx,0,4),Vec(idx,0,-4))
+                line(Vec(0,idx,4),Vec(0,idx,-4))
+                stroke(gui.colorPicker("line col z").adjust(alpha = alpha))
+                line(Vec(idx,-4,0),Vec(idx,4,0))
+                line(Vec(0,-4, idx),Vec(0,4,idx))
 
 
-                }
-            pop()
-        }
+            }
+        pop()
 
 
 
@@ -214,6 +236,86 @@ class Plotter2 : PApplet() {
 //        val shader = ShaderReloader.getShader("grid.frag", "gridVert.glsl")
 //        shader["time"] = T
 //        ShaderReloader.shader("grid.frag", "gridVert.glsl")
+
+        val loop_cnt = standardObserver1931.size/3
+        push()
+        stroke(gui.colorPicker("pt col ").hex)
+        w_strokeWeight(10.0f)
+        var cdf = ArrayList<Float>(loop_cnt)
+        var integral = 0f;
+
+        for (i in 0 until loop_cnt){
+            val samp = standardObserver1931[i*3+1]
+            integral += samp
+            cdf.add(integral)
+//            cdf[i] = integral
+
+            val uv_x = i.toFloat()/loop_cnt - 0.5f
+            point(uv_x,-samp,0.01f)
+        }
+
+        line(
+            Vec(-1,-1,0),
+            Vec(1,-1,0),
+        )
+        stroke(gui.colorPicker("pt col integral").hex)
+
+        var idx = 0
+        draw_curve(
+            amp = 1.0f,
+            offs = 0.0f,
+            range = loop_cnt - 1,
+            fn = { t:Float->
+                var t = t
+
+                val samp = cdf[idx]/integral
+                idx += 1
+                -samp
+            }
+        )
+
+
+        val print_btn_pressed = gui.button("print")
+        idx = 0
+        draw_curve_2d(
+            amp = 1.0f,
+            offs = 0.0f,
+            range = loop_cnt - 1,
+            fn = { t:Float->
+                var t = t
+
+
+                val samp_p = Vec(t,cdf[idx]/integral)
+                val norm = Vec(cos(-pi/4), sin(-pi/4))
+                val samp_p_reflected = samp_p - (norm*2f*(samp_p.x*norm.x + samp_p.y * norm.y))
+
+                if(print_btn_pressed){
+
+                    val df = DecimalFormat("#")
+                    df.maximumFractionDigits = 8
+
+                    kotlin.io.print("(" + df.format(samp_p_reflected.x)  + "," + df.format(samp_p_reflected.y) + "),")
+                }
+
+                samp_p_reflected.y *= -1;
+
+                idx += 1
+                samp_p_reflected
+            }
+        )
+
+
+//        for(i in 0..200){
+//            var r = random(1.0f);
+//        }
+
+//        for (i in 0 until loop_cnt){
+//            val samp = cdf[i]/integral
+//
+//            val uv_x = i.toFloat()/loop_cnt - 0.5f
+//            point(uv_x,-samp,0.01f)
+//        }
+        pop()
 
         // -- plot
 
@@ -229,9 +331,9 @@ class Plotter2 : PApplet() {
                 fn = { t:Float->
                     var t = t
 
-                    idx += 1
 
                     val s = standardObserver1931[idx*3 + i]
+                    idx += 1
                     -s
                 }
             )
