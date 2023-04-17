@@ -7,6 +7,7 @@ import com.krab.lazy.stores.GlobalReferences
 import com.krab.lazy.stores.NormColorStore
 import processing.core.PApplet.sqrt
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.sin
 
 
@@ -15,6 +16,40 @@ import kotlin.math.sin
 //}
 
 //fun <T: Number> fract(t: T): Float{
+
+fun PApplet.world_to_screen(a: PVector): PVector{
+    return Vec(screenX(a.x, a.y, a.z), screenY(a.x, a.y, a.z))
+}
+
+fun PVector.pickable(cam: WCamera, name: String): PVector{
+    val gui = GlobalReferences.gui
+    val papp = GlobalReferences.app
+
+    val norm_screen_space = papp.world_to_screen(this)
+
+    val mouse = Vec(papp.mouseX, papp.mouseY)
+
+    if(!cam.rmb_pressed && gui.isMouseOutsideGui){
+        if( (norm_screen_space - mouse).length() < 20f ){
+            papp.cursor(PApplet.HAND);
+            if(papp.mousePressed && papp.mouseButton == PApplet.LEFT){
+                var delta_pos = cam.right*cam.mouse_delta.x*1f - cam.up*cam.mouse_delta.y*1.0f
+                delta_pos *= (cam.pos_internal - this).length()*0.75f
+                var new_pos_world = this + delta_pos
+                gui.plotSet(name, new_pos_world)
+                val new_pos_screen = papp.world_to_screen(new_pos_world)
+                cam.handle_picking(new_pos_screen)
+            }
+        } else {
+            if(papp.frameCount > 1)
+                papp.cursor(PApplet.ARROW);
+        }
+    }
+    return this
+}
+
+
+
 fun PickerColor.adjust(hue: Float = 0.0f, sat: Float = 0.0f, v: Float = 0.0f, alpha: Float = 0.0f): Int{
     return NormColorStore.color(
         this.hue + hue,
@@ -31,6 +66,8 @@ fun PApplet.camera(eye: PVector, lookAt: PVector){
         0f,1f,0f
     )
 }
+
+
 
 
 
@@ -63,6 +100,15 @@ fun FloatArray.toVec(): PVector {
 //    poin
 //}
 
+//fun length(a: PVector): Float{
+//    return a.length()
+//}
+
+
+fun normalize(a: PVector): PVector{
+    return a.copy().normalize()
+}
+
 fun cross(a: PVector, b: PVector): PVector{
     return a.copy().cross(b)
 }
@@ -94,6 +140,7 @@ object MathUtils {
     const val pi = Math.PI.toFloat()
     const val tau = 2 * pi
 }
+
 
 
 
@@ -147,6 +194,10 @@ fun PApplet.line(a: PVector, b: PVector){
 
 fun PApplet.curveVertex(p: PVector){
     curveVertex(p.x,p.y,p.z)
+}
+
+fun floor(v: PVector): PVector{
+    return PVector(floor(v.x),floor(v.y), floor(v.z))
 }
 
 //fun <T: Number>PApplet.translate(x: T, y:T){

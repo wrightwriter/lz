@@ -3,12 +3,11 @@ import MathUtils.pi
 import com.krab.lazy.LazyGui
 import com.krab.lazy.stores.GlobalReferences
 import processing.core.PApplet
-import processing.core.PConstants
+import processing.core.PConstants.HAND
 import processing.core.PConstants.RIGHT
 import processing.core.PVector
 import processing.event.MouseEvent
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 
 
 fun main(args: Array<String>) {
@@ -84,6 +83,11 @@ class WCamera(
     var pos = Vec(0,0,-1);
     var target = Vec(0,0,0);
 
+    var dir = Vec(0)
+    var right = Vec(0)
+    var up = Vec(0)
+
+
     var smoothing = 0.1f;
 
     var pos_internal = Vec(0,0,-1);
@@ -99,32 +103,49 @@ class WCamera(
 
     var cam_mode_prev: CamMode
     var mouse_pos_prev = Vec(0);
+    var mouse_delta = Vec(0)
 
-    var mouse_pressed = false
+    var rmb_pressed = false
 
     var scroll_wheel = 0f
 
     init{
         cam_mode_prev = cam_mode
     }
+
+    var mouse_pick_pos_to_move_to = Vec(0)
+
+    fun handle_picking(pos_to_warp_to: PVector){
+        mouse_pick_pos_to_move_to = pos_to_warp_to
+    }
+
     fun tick(){
-        if (cam_mode_prev != cam_mode)
-            target = Vec(0,0,0)
+        // Cam mode changed
+        if (cam_mode_prev != cam_mode){
+            if(cam_mode == CamMode.ORBIT){
+                target = Vec(0,0,0)
+                zoom = (pos_internal.length())
+                theta = acos( pos_internal.z/zoom )
+                phi = sign(pos_internal.y)* acos(pos_internal.x/sqrt(pos_internal.x*pos_internal.x + pos_internal.y*pos_internal.y))
+            } else {
+                pos = pos_internal.copy()
+
+            }
+        }
         cam_mode_prev = cam_mode
 
-        mouse_pressed = GlobalReferences.app.mousePressed && (GlobalReferences.app.mouseButton == RIGHT)
+        rmb_pressed = GlobalReferences.app.mousePressed && (GlobalReferences.app.mouseButton == RIGHT)
 
-        val mw = GlobalReferences.app.mouseWheel()
+//        val mw = GlobalReferences.app.mouseWheel()
 
         val new_mouse_pos = Vec(
             GlobalReferences.app.mouseX,
             GlobalReferences.app.mouseY
         )
 
-//        GlobalReferences.app.noCursor()
-
-        if(mouse_pressed != mouse_was_pressed){
-            if(mouse_pressed){
+        // RMB clicked/unclicked
+        if(rmb_pressed != mouse_was_pressed){
+            if(rmb_pressed){
                 mouse_hide_pos = new_mouse_pos
                 mouse_pos_prev = mouse_hide_pos.copy()
                 GlobalReferences.app.noCursor()
@@ -132,23 +153,42 @@ class WCamera(
                 GlobalReferences.appWindow.warpPointer(mouse_hide_pos.x.toInt(), mouse_hide_pos.y.toInt());
                 GlobalReferences.app.cursor()
             }
-            mouse_was_pressed = mouse_pressed
+            mouse_was_pressed = rmb_pressed
         }
 
-        if(mouse_pressed){
-            var mouse_delta = new_mouse_pos - mouse_pos_prev
-            mouse_delta /= GlobalReferences.app.width
+        mouse_delta = new_mouse_pos - mouse_pos_prev
+        mouse_delta /= GlobalReferences.app.width
 
+
+        // Set prev mouse pos
+        if(mouse_pick_pos_to_move_to.length() > 0){
+            // Mouse picked something
+            // Teleport it
+            GlobalReferences.app.cursor(HAND)
+            mouse_pick_pos_to_move_to = floor(mouse_pick_pos_to_move_to)
+            mouse_pos_prev = mouse_pick_pos_to_move_to.copy()
+            GlobalReferences.appWindow.warpPointer(mouse_pick_pos_to_move_to.x.toInt(), mouse_pick_pos_to_move_to.y.toInt());
+            GlobalReferences.app.mouseX = mouse_pick_pos_to_move_to.x.toInt()
+            GlobalReferences.app.mouseY = mouse_pick_pos_to_move_to.y.toInt()
+            mouse_pick_pos_to_move_to = Vec(0,0,0)
+        } else {
+            if(rmb_pressed){
+                mouse_pos_prev = mouse_hide_pos.copy()
+            } else {
+                mouse_pos_prev = new_mouse_pos.copy()
+            }
+        }
+
+        if(rmb_pressed){
             val mouse_speed = 1f;
             theta -= mouse_delta.x*mouse_speed
             phi -= mouse_delta.y*mouse_speed
-
-
-            mouse_pos_prev = mouse_hide_pos.copy()
             GlobalReferences.appWindow.warpPointer(mouse_hide_pos.x.toInt(), mouse_hide_pos.y.toInt());
         }
 
-        zoom -= scroll_wheel*0.15f
+
+        if(GlobalReferences.gui.isMouseOutsideGui)
+            zoom -= scroll_wheel*0.15f
         scroll_wheel = 0f
 
 
@@ -158,20 +198,30 @@ class WCamera(
         theta_internal = lerp(theta_internal, theta, smoothing)
         phi_internal = lerp(
             phi_internal,
-            if(cam_mode == CamMode.PILOT) 1f-phi else phi,
+//            if(cam_mode == CamMode.PILOT) 1f-phi else phi,
+            phi,
             smoothing
         )
         zoom_internal = lerp(zoom_internal, zoom, smoothing)
 
-        val pc = Vec(
+        var polar_coords = Vec(
             PApplet.sin(theta_internal * pi * 2f) * PApplet.sin(phi_internal*pi),
             PApplet.cos(phi_internal*pi),
             PApplet.cos(theta_internal * pi * 2f) * PApplet.sin(phi_internal*pi)
-        ) * zoom_internal
+        )
+        right = cross(Vec(0,1,0),polar_coords).normalize()
+        dir = polar_coords.copy().normalize()
+        up = cross(dir,right).normalize()
+
 
         if(cam_mode == CamMode.ORBIT){
             target_internal = lerp(target_internal, target, smoothing)
-            pos_internal = pc
+            pos_internal = polar_coords * zoom_internal
+
+            dir = (target_internal - pos_internal).normalize()
+            dir.y = dir.y*-1f
+            right = cross(Vec(0,1,0),dir).normalize()*-1f
+            up = cross(right,dir).normalize()
         } else {
             var move_vec = Vec(0,0,0);
             val key = GlobalReferences.app.key
@@ -187,11 +237,15 @@ class WCamera(
                     move_vec.x -= 1
                 }
             }
-            val right_vec = Vec(0,1,0).cross(pc)
 
-            pos += (right_vec*move_vec.x + pc*move_vec.z)/GlobalReferences.app.frameRate
+            pos += (right*move_vec.x + dir*move_vec.z)/GlobalReferences.app.frameRate
             pos_internal = lerp(pos_internal, pos, smoothing)
-            target_internal = pos_internal + pc
+            target_internal = pos_internal + dir
+
+            dir = (target_internal - pos_internal).normalize()
+            dir.y = dir.y*-1f
+            right = cross(Vec(0,1,0),dir).normalize()*-1f
+            up = cross(right,dir).normalize()
         }
     }
 
@@ -211,6 +265,7 @@ class WCamera(
 
 }
 
+
 class PlotterBSDF : PApplet() {
     companion object {
         fun run() {
@@ -218,8 +273,8 @@ class PlotterBSDF : PApplet() {
             art.runSketch()
         }
     }
-    public lateinit var gui: LazyGui
-    public val cam = WCamera(CamMode.ORBIT)
+    lateinit var gui: LazyGui
+    val cam = WCamera(CamMode.ORBIT)
 
     override fun settings() {
         size(800,800,P3D)
@@ -236,25 +291,12 @@ class PlotterBSDF : PApplet() {
         val e: Float = event.getCount().toFloat()
         cam.scroll_wheel = e
     }
-//    override fun keyPressed() {
-//        if (key.code == PConstants.) {
-//            if (keyCode == UP) {
-////                fillVal = 255
-//            } else if (keyCode == DOWN) {
-////                fillVal = 0
-//            }
-//        } else {
-////            fillVal = 126
-//        }
-//    }
 
     override fun draw() {
         val T = millis()/1000.0f
         val fov = PI/3.0f;
         val cameraZ = (height/2.0f) / tan(fov/2.0f);
-        perspective(fov, width.toFloat()/height.toFloat(),
-            gui.slider("zmin"), gui.slider("zmax"));
-
+        perspective(fov, width.toFloat()/height.toFloat(), 0.001f, 100f);
         pushMatrix();
             scale(width/2.0f,width/2.0f,width/2.0f)
 //        scale(width/2.0f,width/2.0f,1.0f)
@@ -284,33 +326,31 @@ class PlotterBSDF : PApplet() {
 
 
 
-        stroke(gui.colorPicker("line col").hex)
-
-        box(gui.slider("boxsz"));
-        line(Vec(0,0,4),Vec(0,0,-4))
-        line(Vec(-4,0,0),Vec(4,0,0))
-        line(Vec(0,-4,0),Vec(0,4,0))
+        stroke(gui.colorPicker("grid/line col").hex)
 
 
-        push()
+        if(gui.toggle("grid/enabled")){
+            push()
             w_strokeWeight(2.0f)
             val line_iters = 20
 
-            val alpha = gui.slider("alpha")
+            val alpha = gui.slider("grid/alpha")
             for(i in 0..line_iters){
                 val idx = i.toFloat()/line_iters * 8.0f - 4.0f
 
-                stroke(gui.colorPicker("line col x").adjust(alpha = alpha))
+                stroke(gui.colorPicker("grid/line col x").adjust(alpha = alpha))
                 line(Vec(4,idx,0),Vec(-4,idx,0))
                 line(Vec(-4,0, idx),Vec(4,0,idx))
-                stroke(gui.colorPicker("line col y").adjust(alpha = alpha))
+                stroke(gui.colorPicker("grid/line col y").adjust(alpha = alpha))
                 line(Vec(idx,0,4),Vec(idx,0,-4))
                 line(Vec(0,idx,4),Vec(0,idx,-4))
-                stroke(gui.colorPicker("line col z").adjust(alpha = alpha))
+                stroke(gui.colorPicker("grid/line col z").adjust(alpha = alpha))
                 line(Vec(idx,-4,0),Vec(idx,4,0))
                 line(Vec(0,-4, idx),Vec(0,4,idx))
             }
-        pop()
+            pop()
+
+        }
 
 
         val theta = 0.6.toFloat()
@@ -375,6 +415,10 @@ class PlotterBSDF : PApplet() {
             return 1f/(2f*pi)
         }
 
+
+//        val normal = gui.plotXYZ("normal")
+
+
         push()
             for (i in 0..gui.sliderInt("hemi iters",20,0,30000)){
                 val col = gui.gradientColorAt("grad",random(1.0f))
@@ -411,6 +455,8 @@ class PlotterBSDF : PApplet() {
 //                    pc *= cosine_pdf_theta(th)
 //                    pc *= cosine_pdf_phi()
                     pc /= cos(th)
+                }  else if (sampling_mode.equals("pow cosine")){
+//                    pc /= ((ggx_alpha+1f)*pow(cos(theta),ggx_alpha))/tau
                 }
 
 
@@ -427,6 +473,24 @@ class PlotterBSDF : PApplet() {
                 stroke(col.adjust(alpha = -0.6f))
                 line(Vec(0),pc)
             }
+        pop()
+
+        push()
+
+            val normal = gui.plotXYZ("normal").pickable(cam, "normal")
+
+            w_strokeWeight(10f)
+            stroke(gui.colorPicker("cols/normal").hex)
+            line(Vec(0), normal)
+            w_strokeWeight(20f)
+            point(normal)
+//
+//            w_strokeWeight(20f)
+//            stroke(gui.colorPicker("cols/normal b").hex)
+////            stroke()
+//            line( normal, normal + cam.up.normalize()*0.1f)
+//            line( normal, normal + cam.right.normalize()*0.1f)
+//            line( normal, normal + cam.dir.normalize()*0.1f)
         pop()
 
 

@@ -811,22 +811,6 @@
       "type": "FOLDER"
     },
     {
-      "valueFloat": 0.10000002,
-      "currentPrecisionIndex": 3,
-      "valueFloatPrecision": 0.1,
-      "className": "SliderNode",
-      "path": "zmin",
-      "type": "VALUE"
-    },
-    {
-      "valueFloat": 82.50003,
-      "currentPrecisionIndex": 3,
-      "valueFloatPrecision": 0.1,
-      "className": "SliderNode",
-      "path": "zmax",
-      "type": "VALUE"
-    },
-    {
       "className": "ButtonNode",
       "path": "pilot-fly toggle",
       "type": "TRANSIENT"
@@ -1404,219 +1388,66 @@
       "type": "FOLDER"
     },
     {
-      "hexString": "FF7A7A7A",
       "children": [
         {
-          "className": "ColorPreviewNode",
-          "path": "line col/preview",
-          "type": "TRANSIENT"
+          "hexString": "FF000000",
+          "children": [
+            {
+              "className": "ColorPreviewNode",
+              "path": "grid/line col/preview",
+              "type": "TRANSIENT"
+            },
+            {
+              "valueFloat": 0.0,
+              "currentPrecisionIndex": 2,
+              "valueFloatPrecision": 0.01,
+              "className": "HueNode",
+              "path": "grid/line col/hue",
+              "type": "VALUE"
+            },
+            {
+              "valueFloat": 0.0,
+              "currentPrecisionIndex": 2,
+              "valueFloatPrecision": 0.01,
+              "className": "SaturationNode",
+              "path": "grid/line col/sat",
+              "type": "VALUE"
+            },
+            {
+              "valueFloat": 0.0,
+              "currentPrecisionIndex": 2,
+              "valueFloatPrecision": 0.01,
+              "className": "BrightnessNode",
+              "path": "grid/line col/br",
+              "type": "VALUE"
+            },
+            {
+              "valueFloat": 1.0,
+              "currentPrecisionIndex": 2,
+              "valueFloatPrecision": 0.01,
+              "className": "AlphaNode",
+              "path": "grid/line col/alpha",
+              "type": "VALUE"
+            },
+            {
+              "className": "ColorPickerHexNode",
+              "path": "grid/line col/hex",
+              "type": "VALUE"
+            }
+          ],
+          "className": "ColorPickerFolderNode",
+          "path": "grid/line col",
+          "type": "FOLDER"
         },
         {
-          "valueFloat": 0.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "HueNode",
-          "path": "line col/hue",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 0.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "SaturationNode",
-          "path": "line col/sat",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 0.47843137,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "BrightnessNode",
-          "path": "line col/br",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 1.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "AlphaNode",
-          "path": "line col/alpha",
-          "type": "VALUE"
-        },
-        {
-          "className": "ColorPickerHexNode",
-          "path": "line col/hex",
+          "valueBoolean": false,
+          "className": "ToggleNode",
+          "path": "grid/enabled",
           "type": "VALUE"
         }
       ],
-      "className": "ColorPickerFolderNode",
-      "path": "line col",
-      "type": "FOLDER"
-    },
-    {
-      "valueFloat": -1.4901161E-8,
-      "currentPrecisionIndex": 3,
-      "valueFloatPrecision": 0.1,
-      "className": "SliderNode",
-      "path": "boxsz",
-      "type": "VALUE"
-    },
-    {
-      "valueFloat": -1.4000016,
-      "currentPrecisionIndex": 3,
-      "valueFloatPrecision": 0.1,
-      "className": "SliderNode",
-      "path": "alpha",
-      "type": "VALUE"
-    },
-    {
-      "hexString": "FF727272",
-      "children": [
-        {
-          "className": "ColorPreviewNode",
-          "path": "line col x/preview",
-          "type": "TRANSIENT"
-        },
-        {
-          "valueFloat": 0.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "HueNode",
-          "path": "line col x/hue",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 0.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "SaturationNode",
-          "path": "line col x/sat",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 0.44705883,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "BrightnessNode",
-          "path": "line col x/br",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 1.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "AlphaNode",
-          "path": "line col x/alpha",
-          "type": "VALUE"
-        },
-        {
-          "className": "ColorPickerHexNode",
-          "path": "line col x/hex",
-          "type": "VALUE"
-        }
-      ],
-      "className": "ColorPickerFolderNode",
-      "path": "line col x",
-      "type": "FOLDER"
-    },
-    {
-      "hexString": "FFA0A0A0",
-      "children": [
-        {
-          "className": "ColorPreviewNode",
-          "path": "line col y/preview",
-          "type": "TRANSIENT"
-        },
-        {
-          "valueFloat": 0.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "HueNode",
-          "path": "line col y/hue",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 0.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "SaturationNode",
-          "path": "line col y/sat",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 0.627451,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "BrightnessNode",
-          "path": "line col y/br",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 1.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "AlphaNode",
-          "path": "line col y/alpha",
-          "type": "VALUE"
-        },
-        {
-          "className": "ColorPickerHexNode",
-          "path": "line col y/hex",
-          "type": "VALUE"
-        }
-      ],
-      "className": "ColorPickerFolderNode",
-      "path": "line col y",
-      "type": "FOLDER"
-    },
-    {
-      "hexString": "FF8C8C8C",
-      "children": [
-        {
-          "className": "ColorPreviewNode",
-          "path": "line col z/preview",
-          "type": "TRANSIENT"
-        },
-        {
-          "valueFloat": 0.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "HueNode",
-          "path": "line col z/hue",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 0.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "SaturationNode",
-          "path": "line col z/sat",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 0.54901963,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "BrightnessNode",
-          "path": "line col z/br",
-          "type": "VALUE"
-        },
-        {
-          "valueFloat": 1.0,
-          "currentPrecisionIndex": 2,
-          "valueFloatPrecision": 0.01,
-          "className": "AlphaNode",
-          "path": "line col z/alpha",
-          "type": "VALUE"
-        },
-        {
-          "className": "ColorPickerHexNode",
-          "path": "line col z/hex",
-          "type": "VALUE"
-        }
-      ],
-      "className": "ColorPickerFolderNode",
-      "path": "line col z",
+      "className": "FolderNode",
+      "path": "grid",
       "type": "FOLDER"
     },
     {
@@ -1691,20 +1522,26 @@
           "type": "TRANSIENT"
         }
       ],
+      "window": {
+        "posX": 308.0,
+        "posY": 22.0,
+        "closed": false,
+        "windowSizeX": 154.0
+      },
       "className": "RadioFolderNode",
       "path": "N mode",
       "type": "FOLDER"
     },
     {
-      "valueFloat": 1.0,
-      "currentPrecisionIndex": 4,
-      "valueFloatPrecision": 1.0,
+      "valueFloat": 3.1739101,
+      "currentPrecisionIndex": 3,
+      "valueFloatPrecision": 0.1,
       "className": "SliderNode",
       "path": "ggx alpha",
       "type": "VALUE"
     },
     {
-      "valueString": "cosine weighted",
+      "valueString": "pow cosine",
       "children": [
         {
           "valueBoolean": false,
@@ -1731,20 +1568,20 @@
           "type": "TRANSIENT"
         },
         {
-          "valueBoolean": true,
+          "valueBoolean": false,
           "className": "RadioItemNode",
           "path": "sample mode/cosine weighted",
           "type": "TRANSIENT"
         },
         {
-          "valueBoolean": false,
+          "valueBoolean": true,
           "className": "RadioItemNode",
           "path": "sample mode/pow cosine",
           "type": "TRANSIENT"
         }
       ],
       "window": {
-        "posX": 264.0,
+        "posX": 506.0,
         "posY": 22.0,
         "closed": false,
         "windowSizeX": 220.0
@@ -1754,12 +1591,111 @@
       "type": "FOLDER"
     },
     {
+      "children": [
+        {
+          "className": "PlotDisplayNode",
+          "path": "normal/_",
+          "type": "TRANSIENT"
+        },
+        {
+          "valueFloat": 0.22791556,
+          "currentPrecisionIndex": 4,
+          "valueFloatPrecision": 1.0,
+          "className": "SliderNode",
+          "path": "normal/x",
+          "type": "VALUE"
+        },
+        {
+          "valueFloat": 0.9774576,
+          "currentPrecisionIndex": 4,
+          "valueFloatPrecision": 1.0,
+          "className": "SliderNode",
+          "path": "normal/y",
+          "type": "VALUE"
+        },
+        {
+          "valueFloat": -0.6630267,
+          "currentPrecisionIndex": 4,
+          "valueFloatPrecision": 1.0,
+          "className": "SliderNode",
+          "path": "normal/z",
+          "type": "VALUE"
+        }
+      ],
+      "window": {
+        "posX": 22.0,
+        "posY": 418.0,
+        "closed": false,
+        "windowSizeX": 154.0
+      },
+      "className": "PlotFolderNode",
+      "path": "normal",
+      "type": "FOLDER"
+    },
+    {
       "valueFloat": 6700.0,
       "currentPrecisionIndex": 6,
       "valueFloatPrecision": 100.0,
       "className": "SliderIntNode",
       "path": "hemi iters",
       "type": "VALUE"
+    },
+    {
+      "children": [
+        {
+          "hexString": "FF6FFF00",
+          "children": [
+            {
+              "className": "ColorPreviewNode",
+              "path": "cols/normal/preview",
+              "type": "TRANSIENT"
+            },
+            {
+              "valueFloat": 0.2607843,
+              "currentPrecisionIndex": 2,
+              "valueFloatPrecision": 0.01,
+              "className": "HueNode",
+              "path": "cols/normal/hue",
+              "type": "VALUE"
+            },
+            {
+              "valueFloat": 1.0,
+              "currentPrecisionIndex": 2,
+              "valueFloatPrecision": 0.01,
+              "className": "SaturationNode",
+              "path": "cols/normal/sat",
+              "type": "VALUE"
+            },
+            {
+              "valueFloat": 1.0,
+              "currentPrecisionIndex": 2,
+              "valueFloatPrecision": 0.01,
+              "className": "BrightnessNode",
+              "path": "cols/normal/br",
+              "type": "VALUE"
+            },
+            {
+              "valueFloat": 1.0,
+              "currentPrecisionIndex": 2,
+              "valueFloatPrecision": 0.01,
+              "className": "AlphaNode",
+              "path": "cols/normal/alpha",
+              "type": "VALUE"
+            },
+            {
+              "className": "ColorPickerHexNode",
+              "path": "cols/normal/hex",
+              "type": "VALUE"
+            }
+          ],
+          "className": "ColorPickerFolderNode",
+          "path": "cols/normal",
+          "type": "FOLDER"
+        }
+      ],
+      "className": "FolderNode",
+      "path": "cols",
+      "type": "FOLDER"
     }
   ],
   "window": {
